@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Set the database path for Arc browser history
 ARC_DB_PATH="$HOME/Library/Application Support/Arc/User Data/Default/History"
