@@ -1,4 +1,7 @@
+#!/bin/zsh
+
 CORES=$(sysctl -n hw.ncpu)
+
 find . -maxdepth 1 -type f \( -iname "*.arw" \) | \
   while read -r f; do
     out="pngs/$(basename "${f%.*}").png"
