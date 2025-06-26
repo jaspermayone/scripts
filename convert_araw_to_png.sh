@@ -1,7 +1,6 @@
 #!/bin/zsh
 
 CORES=$(sysctl -n hw.ncpu)
-
 find . -maxdepth 1 -type f \( -iname "*.arw" \) | \
   while read -r f; do
     out="pngs/$(basename "${f%.*}").png"
@@ -17,3 +16,5 @@ find . -maxdepth 1 -type f \( -iname "*.arw" \) | \
       echo "Failed to convert $fname"
     fi
   '
+
+osascript -e 'display notification "ARW to PNG conversion complete!" with title "Batch Conversion"'
