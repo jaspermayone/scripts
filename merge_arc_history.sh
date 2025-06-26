@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Set paths
 NEW_MAC_DB="$HOME/Library/Application Support/Arc/User Data/Default/History"
