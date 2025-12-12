@@ -1,5 +1,3 @@
-// filename: vercel-delete-before-latest-commit-scoped.js
-
 import https from 'https';
 import { URL } from 'url';
 
@@ -29,7 +27,7 @@ if (!projectArg) {
 }
 
 // Backoff-aware HTTPS JSON request
-async function httpsJsonWithBackoff(urlObj, method = 'GET', headers = {}, body = null, maxRetries = 8) {
+async function httpsJsonWithBackoff(urlObj, method = 'GET', headers = {}, reqBody = null, maxRetries = 8) {
   let attempt = 0;
   let baseDelayMs = 1500; // start at 1.5s
   while (true) {
@@ -42,22 +40,22 @@ async function httpsJsonWithBackoff(urlObj, method = 'GET', headers = {}, body =
         });
       });
       req.on('error', (err) => resolve({ status: 0, headers: {}, body: JSON.stringify({ error: { message: err.message } }) }));
-      if (body) req.write(body);
+      if (reqBody) req.write(reqBody);
       req.end();
     });
 
-    const { status, headers: respHeaders, body } = response;
+    const { status, headers: respHeaders, body: respBody } = response;
     if (status >= 200 && status < 300) {
       try {
-        return body.length ? JSON.parse(body) : {};
+        return respBody.length ? JSON.parse(respBody) : {};
       } catch (e) {
-        throw new Error(`JSON parse error: ${e.message}\nBody: ${body}`);
+        throw new Error(`JSON parse error: ${e.message}\nBody: ${respBody}`);
       }
     }
 
     // Handle 429 with backoff
     let parsed;
-    try { parsed = body ? JSON.parse(body) : null; } catch { parsed = null; }
+    try { parsed = respBody ? JSON.parse(respBody) : null; } catch { parsed = null; }
     const isRateLimited = status === 429 || (parsed && parsed.error && parsed.error.code === 'rate_limited');
     if (isRateLimited && attempt < maxRetries) {
       // Prefer reset from payload; else Retry-After header; else exponential backoff
@@ -84,7 +82,7 @@ async function httpsJsonWithBackoff(urlObj, method = 'GET', headers = {}, body =
     }
 
     // Other errors → throw
-    throw new Error(`HTTP ${method} ${urlObj.href} failed: ${status} ${body}`);
+    throw new Error(`HTTP ${method} ${urlObj.href} failed: ${status} ${respBody}`);
   }
 }
 
